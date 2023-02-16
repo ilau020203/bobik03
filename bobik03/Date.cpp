@@ -1,163 +1,77 @@
-#include "Date.h"
-/*
- Date::Date()
-{
-	std::cout << "Введите дату " << std::endl << "День (от 1 до 31): ";
-	std::cin >> number;
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <map>
+#include <stdlib.h> 
+const std::string dockx_file_path = "C:/Users/Huawei60/Downloads/azszs.docx";
 
-	while ((number <= 0) || (number > 31))std::cin >> number;
-	std::cout << std::endl << "Номер месяца(от 1 до 12): ";
-	std::cin >> month;
-	while ((month <= 0) || (month > 12)) std::cin >> month;
-
-	std::cout << std::endl << "Год : ";
-	std::cin >> year;
-	std::cout << std::endl;
-
-}*/
-
- Date::Date(int number, int month, int year) :number(number), month(month), year(year)
-{
+bool chek_file(std::string fileName) {
+	std::ifstream file(fileName);
+	if (!file) return false;
+	file.close();
+	return true;
 }
 
- Date::Date(std::ifstream& fin)
-{
-	fin >> number >> month >> year;
+std::vector<char> read(std::string fileName) {
+	if (!chek_file(fileName)) std::cout << "FileName Error!" << std::endl;
+	std::vector<char> buff;
+	std::ifstream file(fileName, std::ios::in | std::ios::binary);
+	char byte;
+	while (file) {
+		file.read(&byte, 1);
+		if (file.fail()) {
+			if (!file.eof()) std::cout << "Input error" << std::endl;
+			break;
+		}
+		buff.push_back((char)byte);
+	}
+	file.close();
+	return buff;
 }
 
- Date::Date(const Date& input) :number(input.number), month(input.month), year(input.year)
-{
+void read_file_and_print(std::string file_name) {
+	std::vector<char> file = read(file_name);
+	std::cout << file.size() << std::endl;
+	for (size_t i = 0; i < file.size(); i++) {
+		std::cout << file[i];
+	}
 }
 
-char*  Date::get_str_month() const
-{
-	char* month_str = new char[10];
-	switch (month)
-	{
-	case 1: {
-		strcpy(month_str, "January");
-		return month_str;
-	}
-	case 2: {
-		strcpy(month_str, "February");
-		return month_str;
-	}
-	case 3: {
-		strcpy(month_str, "March");
-		return month_str;
-	}
-	case 4: {
-		strcpy(month_str, "April");
-		return month_str;
-	}
-	case 5: {
-		strcpy(month_str, "May");
-		return month_str;
-	}
-	case 6: {
-		strcpy(month_str, "June");
-		return month_str;
-	}
-	case 7: {
-		strcpy(month_str, "July");
-		return month_str;
-	}
-	case 8: {
-		strcpy(month_str, "August");
-		return month_str;
-	}
-	case 9: {
-		strcpy(month_str, "September");
-		return month_str;
-	}
-	case 10: {
-		strcpy(month_str, "October");
-		return month_str;
-	}
-	case 11: {
-		strcpy(month_str, "November");
-		return month_str;
-	}
-	case 12: {
-		strcpy(month_str, "December");
-		return month_str;
-	}
-	}
-
-	return nullptr;
+void create_file(std::string file_name, std::string content) {
+	std::ofstream fout(file_name);
+	fout << content;
+	fout.close();
 }
 
-int  Date::get_number() const
-{
-	return number;
+void ex1() {
+	std::vector<char> file_bytes = read(dockx_file_path);
+	std::cout << file_bytes.size() << " bytes" << std::endl;
 }
 
-int  Date::get_month() const
-{
-	return month;
-}
-
-int  Date::get_year() const
-{
-	return year;
-}
-
-bool  Date::eql(Date input) const
-{
-	return (input.number==number)&&(input.month==month)&&(year==input.year);
-}
-
-void  Date::save(std::ofstream& fout) const
-{
-	fout << number << " "<< month <<  " " << year << " ";
-}
-
-void  Date::input_date()
-{
-	std::cout << "Введите дату " << std::endl << "День (от 1 до 31): ";
-	std::cin >> number;
-
-	while ((number <= 0) || (number > 31))std::cin >> number;
-	std::cout << std::endl << "Номер месяца(от 1 до 12): ";
-	std::cin >> month;
-	while ((month <= 0) || (month > 12)) std::cin >> month;
-
-	std::cout << std::endl << "Год : ";
-	std::cin >> year;
-	std::cout << std::endl;
-}
-
-bool  later_date(Date a, Date b)
-{
-	if (a.year > b.year) {
-		return 1;
-	}
-	else {
-		if (a.year == b.year) {
-			if (a.month > b.month) {
-				return 1;
-			}
-			else {
-				if (a.number == b.number) {
-					if (a.number > b.number) {
-						return 1;
-					}
-					else {
-						if (a.number == b.number) {
-							return 1;
-						}
-						else {
-							return 0;
-						}
-					}
-				}
-				else {
-					return 0;
-				}
-			}
+void ex2() {
+	std::vector<char> file_bytes = read(dockx_file_path);
+	std::map<char, float> frequencies;
+	for (auto item : file_bytes) {
+		auto it = frequencies.find(item);
+		float frequency;
+		if (it == frequencies.end()) {
+			frequency = 0;
 		}
 		else {
-			return 0;
+			frequency = (*frequencies.find(item)).second;
 		}
+		frequency++;
+		frequencies.emplace(item, frequency);
+		std::cout << frequency;
 	}
+}
+
+int main()
+{
+	std::cout << "Ex_1\n";
+	ex1();
+	std::cout << "EX_2\n";
+	ex2();
+
 }
